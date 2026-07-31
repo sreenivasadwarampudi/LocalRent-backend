@@ -1,0 +1,24 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: localrent-backend
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/localrent}
+      auto-index-creation: true
+
+localrent:
+  jwt:
+    secret: ${JWT_SECRET:change-me-in-production-this-is-a-dev-only-secret-key-1234567890}
+    expiration-ms: 86400000
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+  search:
+    default-radius-km: 20
+    max-radius-km: 100
+
+logging:
+  level:
+    com.localrent: INFO
