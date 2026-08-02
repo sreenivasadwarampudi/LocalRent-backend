@@ -54,7 +54,7 @@ public class ListingService {
         User owner = requireOwner(ownerId);
         Listing listing = new Listing();
         listing.setOwnerId(owner.getId());
-        apply(listing, request);
+        apply(listing, request, owner);
         listingRepository.save(listing);
         return toResponse(listing, owner.getName(), null);
     }
@@ -66,7 +66,7 @@ public class ListingService {
         if (!listing.getOwnerId().equals(ownerId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only edit your own listings");
         }
-        apply(listing, request);
+        apply(listing, request, owner);
         listingRepository.save(listing);
         return toResponse(listing, owner.getName(), null);
     }
@@ -158,7 +158,7 @@ public class ListingService {
         return user;
     }
 
-    private void apply(Listing listing, ListingRequest request) {
+    private void apply(Listing listing, ListingRequest request, User owner) {
         listing.setTitle(request.title());
         listing.setDescription(request.description());
         listing.setCategory(request.category());
@@ -169,7 +169,8 @@ public class ListingService {
         listing.setLocation(new GeoJsonPoint(request.longitude(), request.latitude()));
         listing.setImageUrls(request.imageUrls() == null ? List.of() : request.imageUrls());
         listing.setAvailable(request.available() == null || request.available());
-        listing.setContactPhone(request.contactPhone());
+        String contactPhone = request.contactPhone();
+        listing.setContactPhone(contactPhone == null || contactPhone.isBlank() ? owner.getPhone() : contactPhone);
     }
 
     private ListingResponse toResponse(Listing listing, String ownerName, Double distanceKm) {
