@@ -6,7 +6,7 @@ spring:
     name: localrent-backend
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/localrent}
+      uri: mongodb+srv://dssreddy428_db_user:J02BD6bL9lO6Ofmi@localrent-cluster.hpch4xh.mongodb.net/localrentdb?retryWrites=true&w=majority&appName=localrent-cluster
       auto-index-creation: true
 
 localrent:
