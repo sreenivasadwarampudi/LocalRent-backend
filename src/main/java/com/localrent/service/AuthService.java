@@ -4,6 +4,7 @@ import com.localrent.dto.AuthDtos.AuthResponse;
 import com.localrent.dto.AuthDtos.LoginRequest;
 import com.localrent.dto.AuthDtos.SignupRequest;
 import com.localrent.dto.AuthDtos.UserResponse;
+import com.localrent.model.Role;
 import com.localrent.model.User;
 import com.localrent.repository.UserRepository;
 import com.localrent.security.JwtService;
@@ -26,23 +27,23 @@ public class AuthService {
     }
 
     public AuthResponse signup(SignupRequest request) {
-        if (userRepository.existsByEmailIgnoreCase(request.email())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already registered");
+        String phone = normalizePhone(request.phone());
+        if (userRepository.existsByPhone(phone)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number is already registered");
         }
         User user = new User();
         user.setName(request.name());
-        user.setEmail(request.email().toLowerCase());
+        user.setPhone(phone);
         user.setPasswordHash(passwordEncoder.encode(request.password()));
-        user.setPhone(request.phone());
-        user.setRole(request.role());
+        user.setRole(Role.OWNER);
         userRepository.save(user);
         return toAuthResponse(user);
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmailIgnoreCase(request.email())
+        User user = userRepository.findByPhone(normalizePhone(request.phone()))
                 .filter(candidate -> passwordEncoder.matches(request.password(), candidate.getPasswordHash()))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid phone number or password"));
         return toAuthResponse(user);
     }
 
@@ -53,11 +54,15 @@ public class AuthService {
     }
 
     private AuthResponse toAuthResponse(User user) {
-        String token = jwtService.generateToken(user.getId(), user.getEmail(), user.getRole().name());
+        String token = jwtService.generateToken(user.getId(), user.getPhone(), user.getRole().name());
         return new AuthResponse(token, toUserResponse(user));
     }
 
+    private String normalizePhone(String phone) {
+        return phone.replaceAll("[^0-9+]", "");
+    }
+
     private UserResponse toUserResponse(User user) {
-        return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.getPhone(), user.getRole());
+        return new UserResponse(user.getId(), user.getName(), user.getPhone(), user.getRole());
     }
 }

@@ -12,11 +12,10 @@ public class User {
     private String id;
 
     @Indexed(unique = true)
-    private String email;
+    private String phone;
 
     private String passwordHash;
     private String name;
-    private String phone;
     private Role role;
     private Instant createdAt = Instant.now();
 
@@ -28,12 +27,12 @@ public class User {
         this.id = id;
     }
 
-    public String getEmail() {
-        return email;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getPasswordHash() {
@@ -50,14 +49,6 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public Role getRole() {
