@@ -25,11 +25,11 @@ public class SecurityConfig {
 
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter,
-            @Value("#{'${localrent.cors.allowed-origins:https://local-rent-frontend.vercel.app,http://localhost:4200}'.split(',')}") List<String> allowedOrigins) {
+            @Value("#{'${localrent.cors.allowed-origins:https://localrent.co.in,https://www.localrent.co.in,https://local-rent-frontend.vercel.app,http://localhost:4200}'.split(',')}") List<String> allowedOrigins) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.allowedOrigins = allowedOrigins;
     }
-
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
