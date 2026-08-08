@@ -24,7 +24,12 @@ public final class AuthDtos {
             @NotBlank String password) {
     }
 
-    public record UserResponse(String id, String name, String phone, Role role) {
+    public record GoogleAuthRequest(
+            @NotBlank String idToken) {
+    }
+
+    // Updated with the email field
+    public record UserResponse(String id, String name, String phone, String email, Role role) {
     }
 
     public record AuthResponse(String token, UserResponse user) {

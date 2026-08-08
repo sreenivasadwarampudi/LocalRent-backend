@@ -40,20 +40,36 @@ public class AuthService {
         return toAuthResponse(user);
     }
 
-    public AuthResponse login(LoginRequest request) {
+   /* public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByPhone(normalizePhone(request.phone()))
                 .filter(candidate -> passwordEncoder.matches(request.password(), candidate.getPasswordHash()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid phone number or password"));
         return toAuthResponse(user);
+    } */
+    
+    public AuthResponse login(LoginRequest request) {
+        // 1. Check if user exists by phone number
+        User user = userRepository.findByPhone(normalizePhone(request.phone()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid phone number"));
+
+        // 2. Check if the password matches
+        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
+        }
+
+        return toAuthResponse(user);
     }
 
-    public UserResponse currentUser(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    public UserResponse currentUser(String principalName) {
+        User user = userRepository.findById(principalName)
+                .orElseGet(() -> userRepository.findByPhone(principalName)
+                .orElseGet(() -> userRepository.findByEmail(principalName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"))));
         return toUserResponse(user);
     }
 
     private AuthResponse toAuthResponse(User user) {
+        // Uses user.getId() as primary identifier for JWT standard
         String token = jwtService.generateToken(user.getId(), user.getPhone(), user.getRole().name());
         return new AuthResponse(token, toUserResponse(user));
     }
@@ -63,6 +79,12 @@ public class AuthService {
     }
 
     private UserResponse toUserResponse(User user) {
-        return new UserResponse(user.getId(), user.getName(), user.getPhone(), user.getRole());
+        return new UserResponse(
+                user.getId(), 
+                user.getName(), 
+                user.getPhone(), 
+                user.getEmail(), 
+                user.getRole()
+        );
     }
 }

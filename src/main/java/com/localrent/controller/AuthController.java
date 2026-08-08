@@ -4,7 +4,10 @@ import com.localrent.dto.AuthDtos.AuthResponse;
 import com.localrent.dto.AuthDtos.LoginRequest;
 import com.localrent.dto.AuthDtos.SignupRequest;
 import com.localrent.dto.AuthDtos.UserResponse;
+import com.localrent.dto.GoogleAuthRequest;
 import com.localrent.service.AuthService;
+import com.localrent.service.GoogleAuthService;
+
 import jakarta.validation.Valid;
 import java.security.Principal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,9 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final GoogleAuthService googleAuthService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, GoogleAuthService googleAuthService) {
         this.authService = authService;
+        this.googleAuthService = googleAuthService;
     }
 
     @PostMapping("/signup")
@@ -37,4 +42,11 @@ public class AuthController {
     public UserResponse me(Principal principal) {
         return authService.currentUser(principal.getName());
     }
+    
+    @PostMapping("/google")
+    public AuthResponse googleLogin(@Valid @RequestBody GoogleAuthRequest request) {
+        return googleAuthService.loginWithGoogle(request.idToken());
+    }
+
+    
 }
