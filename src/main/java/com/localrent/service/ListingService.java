@@ -54,6 +54,12 @@ public class ListingService {
         User owner = requireOwner(ownerId);
         Listing listing = new Listing();
         listing.setOwnerId(owner.getId());
+        User user = userRepository.findById(ownerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (user.getPhone() == null || user.getPhone().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PHONE_REQUIRED: Please provide your mobile number before posting a rental.");
+        }
         apply(listing, request, owner);
         listingRepository.save(listing);
         return toResponse(listing, owner.getName(), null);
