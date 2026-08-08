@@ -25,3 +25,7 @@ localrent:
 logging:
   level:
     com.localrent: INFO
+    
+google:
+  client:
+    id: 1099177091158-15flq7gs3snqjuaj3qenmtsa528lk3mb.apps.googleusercontent.com

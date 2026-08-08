@@ -11,8 +11,11 @@ public class User {
     @Id
     private String id;
 
-    @Indexed(unique = true)
-    private String phone;
+    @Indexed(unique = true, sparse = true)
+    private String phone; // Nullable for Google-only users
+
+    @Indexed(unique = true, sparse = true)
+    private String email; // Nullable for Phone-only users
 
     private String passwordHash;
     private String name;
@@ -33,6 +36,14 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPasswordHash() {
