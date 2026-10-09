@@ -4,18 +4,16 @@ import com.localrent.dto.AuthDtos.AuthResponse;
 import com.localrent.dto.AuthDtos.LoginRequest;
 import com.localrent.dto.AuthDtos.SignupRequest;
 import com.localrent.dto.AuthDtos.UserResponse;
+import com.localrent.dto.FacebookAuthRequest;
 import com.localrent.model.User;
 import com.localrent.repository.UserRepository;
-import com.localrent.controller.UserController.UpdatePhoneRequest;
 import com.localrent.dto.GoogleAuthRequest;
 import com.localrent.service.AuthService;
+import com.localrent.service.FacebookAuthService;
 import com.localrent.service.GoogleAuthService;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-
 import java.security.Principal;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,12 +35,18 @@ public class AuthController {
     public record UpdatePhoneRequest(@NotBlank String phone) {}
 
 
-    public AuthController(AuthService authService, GoogleAuthService googleAuthService,UserRepository userRepository) {
+    private final FacebookAuthService facebookAuthService;
+
+    public AuthController(AuthService authService,
+                          GoogleAuthService googleAuthService,
+                          UserRepository userRepository,
+                          FacebookAuthService facebookAuthService) {
         this.authService = authService;
         this.googleAuthService = googleAuthService;
         this.userRepository = userRepository;
+        this.facebookAuthService = facebookAuthService;
     }
-
+    
     @PostMapping("/signup")
     public AuthResponse signup(@Valid @RequestBody SignupRequest request) {
         return authService.signup(request);
@@ -61,6 +65,11 @@ public class AuthController {
     @PostMapping("/google")
     public AuthResponse googleLogin(@Valid @RequestBody GoogleAuthRequest request) {
         return googleAuthService.loginWithGoogle(request.idToken());
+    }
+    
+    @PostMapping("/facebook")
+    public AuthResponse facebookLogin(@Valid @RequestBody FacebookAuthRequest request) {
+        return facebookAuthService.loginWithFacebook(request.accessToken());
     }
     
     @PutMapping("/phone")

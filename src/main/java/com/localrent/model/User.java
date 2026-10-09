@@ -20,6 +20,17 @@ public class User {
     private String passwordHash;
     private String name;
     private Role role;
+    
+    @Indexed(unique = true, sparse = true)
+    private String facebookId; // Nullable for non-Facebook users
+
+    public String getFacebookId() {
+        return facebookId;
+    }
+
+    public void setFacebookId(String facebookId) {
+        this.facebookId = facebookId;
+    }
     private Instant createdAt = Instant.now();
 
     public String getId() {
