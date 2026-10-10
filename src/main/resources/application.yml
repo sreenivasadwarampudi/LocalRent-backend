@@ -29,3 +29,8 @@ logging:
 google:
   client:
     id: 1099177091158-15flq7gs3snqjuaj3qenmtsa528lk3mb.apps.googleusercontent.com
+    
+
+facebook:
+  app-id: ${FACEBOOK_APP_ID}
+  app-secret: ${FACEBOOK_APP_SECRET}
